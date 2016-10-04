@@ -1,6 +1,6 @@
 {
   "name": "raml-aware",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "license": "LICENSE.md",
   "description": "Element that is aware of the RAML content",
   "devDependencies": {
