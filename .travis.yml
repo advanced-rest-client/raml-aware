@@ -1,18 +1,26 @@
 language: node_js
 sudo: required
-before_script:
-- npm install -g bower polylint web-component-tester
-- bower install
-- polylint
+dist: trusty
 node_js: stable
+before_script:
+- npm install --silent bower polymer-cli
+- bower install --silent
 addons:
-  firefox: '46.0'
-  apt:
-    sources:
-    - google-chrome
-    packages:
-    - google-chrome-stable
   sauce_connect: true
 script:
-- xvfb-run wct
-dist: trusty
+- npm run lint
+- node_modules/.bin/polymer test --plugin sauce --job-name "raml-aware:${TRAVIS_BRANCH}" --build-number=${TRAVIS_BUILD_NUMBER}
+cache:
+  directories:
+  - bower_components
+  - node_modules
+branches:
+  only:
+    - stage
+    - develop
+after_success:
+  - node tasks/ci.js
+env:
+  global:
+  - secure: fWLFxuYmqXKPW/ZGdjnnjdujiIzqqONwhW22RvUnusMjG8PPs4T+3/MRvC1Xr2fupAmOJy+V5VvlCoMBddfn9lea7HVDJjB2IlqMeV851I2jda3zwmG1Sa6BHSPWZOrI4yQJcZEfBHzBM8cgnY7GwdB0DgJ/POQFWK/Dnrf9N+o7qE1v0rhHIwnNJFYtIIMkI3vBXSc6cnnoH+pq08PTCAqfyD6SxALWEFBeO4hOJ0HhAbEiOjMUdP80J5/DCLoFXhhX1GgGaCHFJDFczWPOaa+KXmM42dvGJFH7aj9Ey/jqZx7P3T9CvJ8cm6b5D2dNUGDOQ8IKcDXiviiB54TYNroftnZTHlGtoIxN1nqSQmzi4WKN9r0QqveaH9yRnIHW9a9N8mQz2ALjIsKSycs4F5iVbD/CPhRZttvTXmpguyRPzJNnsp/GX3LMIMaUqXJCHYRUPVtNxKIpuIuUiBhHq9vldHg/dfqiK0BwzdycncEjBY3jp9QEi+VkifqUw40oOqtJroodUr+7WmUu1zP3THeP41CpIYoFU3zIbyvSHsEwAni/ZqK9iROg4WxOcQIDmxH2IfKs/gQGctqRa0j9lcdPzfnb6wQz9Kn8c5R9vtLhRnhyhYQUX1MqAZfske35wCkfR0pO+xHvY11YApXYRdH7Nfn50hDCJ9ZOgKG7/nQ=
+  - secure: Awy4GWVmJuAxc9o7cHLtwJkiYpNYUGUTI2dUmPugu7lCHqxmgUZcazROeMkwcBIjGKTtBG3mGo5CDTbYhAU1Fhka3jtEW28U9JgbFPdiwSxEZ05GJJ3D9bzAlAt3CiG4NxNflQOxgu0PeRtqaaaQ1F12ESgDcn0KNBB+FLmsnFBU6PbRoKlT4egVTN8biKU+ijG3sbhmgJ7we4NB6U9EnOgI9X4fTcM/MOKGDgMrglRfv2vVWRVku8NWD7N41OZ8t2oncjnDKmiSjiVvfaT4KUlBuWudIt78ltvLPqzunBJCtSGWOoBESsptGH5CRpN5mmvrDrMkcB+EHSY5GQuVLsVFIXdSp7vkgghi1sbNS2z6Irqt4vmbvtuvl4VEI5rQzh7bt5PbLpILgZJrqKtJDaRTW8MyUgY77X9s43gqoZStk0r2mfgrtIWG5/0STSTgrq3hIjs8l9BTZOz7Dr7lZXpl/sTvPG+VGTxaY7FhoPN/PprGoNuHXjfFM7kkDiRRgBElfKwryFix2lCydMJsblpEREtOQG5EluYb3MD0F+8n7Bgqv/uQk+J7Po/zk0Q5Q/kb7esFW7WPnJu50fJWC3l01wWlV/cpMW5aiXdTnlsB1gLu3WHAm9MM1KXPH/7iyEJAei/pwIVxnicWWsQ4xv5BxeImAr1KFAGNORSTFv8=
