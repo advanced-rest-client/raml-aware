@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.org/advanced-rest-client/raml-aware.svg?branch=stage)](https://travis-ci.org/advanced-rest-client/raml-aware)  
+
+# raml-aware
 
 `<raml-aware>` Element that is aware of the RAML content.
 
