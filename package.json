@@ -1,26 +1,23 @@
 {
-  "name": "raml-aware",
-  "version": "1.0.3",
-  "license": "Apache-2.0 OR CC-BY-4.0",
+  "name": "@api-components/raml-aware",
   "description": "Element that is aware of the RAML content",
+  "version": "2.0.0-preview",
+  "license": "Apache-2.0",
+  "authors": [
+    "pawel Psztyc",
+    "The Advanced REST client authors <arc@mulesoft.com>"
+  ],
   "devDependencies": {
-    "polymer-cli": "^0.17.0"
-  },
-  "engines": {
-    "node": ">=0.10.0"
+    "@polymer/gen-typescript-declarations": "^1.1.1",
+    "bower": "^1.8.0"
   },
   "private": false,
-  "main": [
-    "raml-aware.html"
-  ],
-  "author": "The Advanced REST client authors",
+  "main": "raml-aware.html",
   "scripts": {
-    "serve": "node_modules/.bin/polymer serve",
-    "lint": "node_modules/.bin/polymer lint raml-aware.html",
-    "test-sauce": "node_modules/.bin/polymer test --plugin sauce --job-name \"raml-aware:local-test\"",
-    "test": "node_modules/.bin/polymer test",
-    "deps": "npm install --quiet && bower install --quiet",
-    "update-deps": "npm update --quiet && bower update --quiet"
+    "lint": "polymer lint raml-aware.html",
+    "test-sauce": "polymer test --plugin sauce --job-name \"raml-aware:local-test\"",
+    "test": "polymer test --plugin local",
+    "update-types": "gen-typescript-declarations --deleteExisting --outDir ."
   },
   "repository": {
     "type": "git",
