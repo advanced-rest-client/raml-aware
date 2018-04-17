@@ -17,7 +17,7 @@ the License.
   'use strict';
   const RAMLAware = {
     defaultScope: 'default',
-    ramlAwares: new Map(),
+    ramlAwares: [],
     /**
      * Store for RAML definitions.
      * @type {Object<String, Object>} The key is a scope (`default` by default)
@@ -31,13 +31,13 @@ the License.
      * @param {RamlAware} aware The aware instance.
      */
     attachRamlAware: function(aware) {
-      if (!this.ramlAwares.has(aware)) {
-        const scope = aware.scope || this.defaultScope;
-        this.ramlAwares.set(aware, scope);
-        if (this.raml[scope] === undefined && aware.raml) {
-          this.raml[scope] = aware.raml;
+      if (this.ramlAwares.indexOf(aware) === -1) {
+        this.ramlAwares.push(aware);
+        if (!aware.scope) {
+          aware.scope = this.defaultScope;
+        } else {
+          this.scopeChanged(aware);
         }
-        aware._initializeValues(scope, this.raml[scope]);
       }
     },
     /**
@@ -45,13 +45,13 @@ the License.
      * @param {RamlAware} aware Instance of the aware
      */
     detachRamlAware: function(aware) {
-      if (!this.ramlAwares.has(aware)) {
+      const index = this.ramlAwares.indexOf(aware);
+      if (index !== -1) {
+        this.ramlAwares.splice(index, 1);
+        this.cleanUpData(aware.scope);
+      } else {
         console.warn('The aware wasn\'t attached!');
-        return;
       }
-      this.ramlAwares.delete(aware);
-      const scope = aware.scope;
-      this.cleanUpData(scope);
     },
     /**
      * [setRaml description]
@@ -61,22 +61,24 @@ the License.
       const scope = srcAware.scope || this.defaultScope;
       const raml = srcAware.raml || undefined;
       this.raml[scope] = raml;
-      for (let [aware, itemScope] of this.ramlAwares) {
+      const defaultScope = this.defaultScope;
+      this.ramlAwares.forEach(function(aware) {
         if (aware === srcAware) {
-          continue;
+          return;
         }
-        const localScope = itemScope || this.defaultScope;
+        const localScope = aware.scope || defaultScope;
         if (localScope !== scope) {
-          continue;
+          return;
         }
         aware.raml = raml;
-      }
+      });
     },
 
     scopeChanged: function(aware) {
       const scope = aware.scope || this.defaultScope;
-      aware.raml = this.raml[scope];
-      this.ramlAwares.set(aware, scope);
+      if (this.raml[scope]) {
+        aware.raml = this.raml[scope];
+      }
     },
     /**
      * Checks if
@@ -84,12 +86,13 @@ the License.
      * @return {[type]} [description]
      */
     cleanUpData: function(scope) {
-      for (let [, itemScope] of this.ramlAwares) {
-        if (itemScope === scope) {
+      const awares = this.ramlAwares;
+      for (var i = 0, len = awares.length; i < len; i++) {
+        if (awares[i].scope === scope) {
           return;
         }
       }
-      this.raml[scope] = undefined;
+      delete this.raml[scope];
     }
   };
   /**
@@ -147,7 +150,7 @@ the License.
           type: String,
           observer: '_scopeChanged'
         },
-        // The RAML definition.
+        // The RAML/AMF definition.
         raml: {
           type: Object,
           notify: true
@@ -163,39 +166,22 @@ the License.
     connectedCallback() {
       super.connectedCallback();
       RAMLAware.attachRamlAware(this);
-      this.__connected = true;
     }
 
     disconnectedCallback() {
-      this.__connected = false;
       super.disconnectedCallback();
       RAMLAware.detachRamlAware(this);
-    }
-
-    _initializeValues(scope, raml) {
-      if (!this.scope) {
-        this.scope = scope;
-      }
-      if (!this.raml) {
-        this.raml = raml;
-      }
     }
     /**
      * Update RAML data for selected scope.
      */
     _scopeChanged() {
-      if (!this.__connected) {
-        return;
-      }
       RAMLAware.scopeChanged(this);
     }
     /**
      * Notifies other awares about RAML change.
      */
     _ramlChanged() {
-      if (!this.__connected) {
-        return;
-      }
       RAMLAware.setRaml(this);
     }
   }
