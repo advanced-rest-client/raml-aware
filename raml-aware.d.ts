@@ -10,7 +10,7 @@
 
 /// <reference path="../polymer/types/polymer-element.d.ts" />
 
-declare namespace LogicElements {
+declare namespace ApiElements {
 
   /**
    * Element that is aware of the AMF (RAML, OAS) content.
@@ -58,12 +58,11 @@ declare namespace LogicElements {
     scope: string|null|undefined;
 
     /**
-     * The RAML definition.
+     * The RAML/AMF definition.
      */
     raml: object|null|undefined;
     connectedCallback(): void;
     disconnectedCallback(): void;
-    _initializeValues(scope: any, raml: any): void;
 
     /**
      * Update RAML data for selected scope.
@@ -78,5 +77,5 @@ declare namespace LogicElements {
 }
 
 interface HTMLElementTagNameMap {
-  "raml-aware": LogicElements.RamlAware;
+  "raml-aware": ApiElements.RamlAware;
 }
