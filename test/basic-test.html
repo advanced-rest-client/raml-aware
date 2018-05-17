@@ -12,17 +12,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
-
+    <link rel="import" href="../../polymer/lib/utils/render-status.html">
     <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
     <script src="../../web-component-tester/browser.js"></script>
-    <script src="../../iron-test-helpers/test-helpers.js"></script>
-    <script src="../../iron-test-helpers/mock-interactions.js"></script>
-
-    <!-- Step 1: import the element to test -->
     <link rel="import" href="../raml-aware.html">
   </head>
   <body>
-
     <test-fixture id="a1">
       <template>
         <raml-aware></raml-aware>
@@ -45,42 +40,98 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </test-fixture>
 
     <script>
-    /* global suite, test, fixture, assert */
-    suite('basic', function() {
-      var a1;
-      var a2;
-      var a3;
-      var a4;
-      setup(function() {
+    suite('basic', () => {
+      let a1;
+      let a2;
+      let a3;
+      let a4;
+      setup(() => {
         a1 = fixture('a1');
         a2 = fixture('a2');
         a3 = fixture('a3');
         a4 = fixture('a4');
       });
-      teardown(function() {
-        a1.parentNode.removeChild(a1);
-        a2.parentNode.removeChild(a2);
-        a3.parentNode.removeChild(a3);
-        a4.parentNode.removeChild(a4);
+
+      teardown(() => {
         a1.raml = undefined;
         a2.raml = undefined;
         a3.raml = undefined;
         a4.raml = undefined;
+        a1.parentNode.removeChild(a1);
+        a2.parentNode.removeChild(a2);
+        a3.parentNode.removeChild(a3);
+        a4.parentNode.removeChild(a4);
       });
-      test('`raml-aware` should set RAML for detault scope', function() {
-        var obj = {'a': 'b'};
+
+      test('Sets default scope', () => {
+        assert.equal(a1.scope, 'default');
+        assert.equal(a3.scope, 'default');
+      });
+
+      test('Respects scope from attribute', () => {
+        assert.equal(a2.scope, 'test');
+        assert.equal(a4.scope, 'test');
+      });
+
+      test('Sets data on default scopes only', () => {
+        const obj = {a: 'b'};
         a1.raml = obj;
-        assert.deepEqual(a3.raml, obj, 'a3.raml equals ' + JSON.stringify(obj));
+        assert.equal(a3.raml.a, 'b');
+        assert.isUndefined(a2.raml);
+        assert.isUndefined(a4.raml);
       });
-      test('`raml-aware` should set RAML for test scope', function() {
-        var obj = {'a': 'b'};
+
+      test('Sets data on defined scopes only', () => {
+        const obj = {b: 'c'};
         a2.raml = obj;
-        assert.deepEqual(a4.raml, obj, 'a4.raml equals ' + JSON.stringify(obj));
+        assert.isUndefined(a1.raml);
+        assert.isUndefined(a3.raml);
+        assert.equal(a4.raml.b, 'c');
       });
-      test('`raml-aware` should not set RAML for other scopes', function() {
-        var obj = {'a': 'b'};
+
+      test('`raml-aware` should set RAML for test scope', () => {
+        const obj = {'a': 'b'};
+        a2.raml = obj;
+        assert.deepEqual(a4.raml, obj);
+      });
+      test('`raml-aware` should not set RAML on other scopes', () => {
+        const obj = {'a': 'b'};
         a1.raml = obj;
-        assert.notDeepEqual(a2.raml, obj, 'a2.raml not equals ' + JSON.stringify(obj));
+        assert.notDeepEqual(a2.raml, obj);
+      });
+    });
+
+    suite('Data cleanup', () => {
+      let a1;
+      let a2;
+      let a3;
+
+      function create(raml) {
+        const a = document.createElement('raml-aware');
+        a.raml = raml;
+        document.body.appendChild(a);
+        return a;
+      }
+
+      test('Seeps reference to the data when one is removed', (done) => {
+        a1 = create('test');
+        a2 = create();
+        a1.parentNode.removeChild(a1);
+        a3 = create();
+        Polymer.RenderStatus.afterNextRender(this, () => {
+          assert.equal(a3.raml, 'test');
+          a3.parentNode.removeChild(a3);
+          done();
+        });
+      });
+
+      test('Removing only aware clears data', (done) => {
+        a2.parentNode.removeChild(a2);
+        a3 = create();
+        Polymer.RenderStatus.afterNextRender(this, () => {
+          assert.isUndefined(a3.raml);
+          done();
+        });
       });
     });
     </script>
