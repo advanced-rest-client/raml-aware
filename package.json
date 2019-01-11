@@ -1,7 +1,7 @@
 {
   "name": "@api-components/raml-aware",
   "description": "Element that is aware of the RAML content",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "license": "Apache-2.0",
   "authors": [
     "pawel Psztyc",
