@@ -5,13 +5,15 @@
  *   https://github.com/Polymer/tools/tree/master/packages/gen-typescript-declarations
  *
  * To modify these typings, edit the source file(s):
- *   raml-aware.html
+ *   raml-aware.js
  */
 
 
 // tslint:disable:variable-name Describing an API that's defined elsewhere.
 
-/// <reference path="../polymer/types/polymer-element.d.ts" />
+import {PolymerElement} from '@polymer/polymer/polymer-element.js';
+
+export {RamlAware};
 
 declare namespace ApiElements {
 
@@ -48,7 +50,7 @@ declare namespace ApiElements {
    * web components callback methods to initialize value. If the component is
    * never attached it will never initialize it's values.
    */
-  class RamlAware extends Polymer.Element {
+  class RamlAware extends PolymerElement {
 
     /**
      * Scope for the RAML file.
@@ -79,6 +81,9 @@ declare namespace ApiElements {
   }
 }
 
-interface HTMLElementTagNameMap {
-  "raml-aware": ApiElements.RamlAware;
+declare global {
+
+  interface HTMLElementTagNameMap {
+    "raml-aware": ApiElements.RamlAware;
+  }
 }
