@@ -24,7 +24,8 @@
     "mocha": "^5.2.0",
     "wct-mocha": "^1.0.0",
     "@polymer/iron-test-helpers": "^3.0.0",
-    "@polymer/iron-component-page": "^4.0.0"
+    "@polymer/iron-component-page": "^4.0.0",
+    "sinon": "^7.2.3"
   },
   "main": "raml-aware.js",
   "scripts": {
@@ -32,12 +33,6 @@
     "test-sauce": "polymer test --plugin sauce --job-name \"raml-aware:local-test\"",
     "test": "polymer test --plugin local",
     "update-types": "gen-typescript-declarations --deleteExisting --outDir ."
-  },
-  "resolutions": {
-    "inherits": "2.0.3",
-    "samsam": "1.1.3",
-    "supports-color": "3.1.2",
-    "type-detect": "1.0.0"
   },
   "contributors": [
     "pawel Psztyc",
