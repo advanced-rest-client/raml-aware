@@ -5,7 +5,7 @@ const createBaseConfig = require('./karma.conf.js');
 
 module.exports = (config) => {
   const cnf = slSettings(config);
-  cnf.sauceLabs.testName = 'paper-chip-input';
+  cnf.sauceLabs.testName = 'raml-aware';
   // cnf.browsers = [
   //   'SL_Chrome',
   //   'SL_Chrome-1',
