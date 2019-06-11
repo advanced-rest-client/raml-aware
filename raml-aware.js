@@ -11,26 +11,28 @@ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 License for the specific language governing permissions and limitations under
 the License.
 */
-import {PolymerElement} from '../../@polymer/polymer/polymer-element.js';
-
-const RAMLAware = {
+const ApiAware = {
   defaultScope: 'default',
-  ramlAwares: [],
+  /**
+   * List of registered awares
+   * @type {Array}
+   */
+  awares: [],
   /**
    * Store for RAML definitions.
    * @type {Object<String, Object>} The key is a scope (`default` by default)
-   * and the value is the RAML definition for this scope.
+   * and the value is the API definition for this scope.
    */
-  raml: {},
+  apis: {},
   /**
    * Attaches new RAML aware to the system. Added aware element will get
    * updates about new content.
    *
    * @param {RamlAware} aware The aware instance.
    */
-  attachRamlAware: function(aware) {
-    if (this.ramlAwares.indexOf(aware) === -1) {
-      this.ramlAwares.push(aware);
+  attachAware: function(aware) {
+    if (this.awares.indexOf(aware) === -1) {
+      this.awares.push(aware);
       if (!aware.scope) {
         aware.scope = this.defaultScope;
       } else {
@@ -42,25 +44,25 @@ const RAMLAware = {
    * Removes avare from the map.
    * @param {RamlAware} aware Instance of the aware
    */
-  detachRamlAware: function(aware) {
-    const index = this.ramlAwares.indexOf(aware);
+  detachAware: function(aware) {
+    const index = this.awares.indexOf(aware);
     if (index !== -1) {
-      this.ramlAwares.splice(index, 1);
+      this.awares.splice(index, 1);
       this.cleanUpData(aware.scope);
     } else {
       console.warn('The aware wasn\'t attached!');
     }
   },
   /**
-   * [setRaml description]
+   * Registers API data and aware.
    * @param {HTMLElement} srcAware The aware that notified about the change
    */
-  setRaml: function(srcAware) {
+  setApi: function(srcAware) {
     const scope = srcAware.scope || this.defaultScope;
     const raml = srcAware.raml || undefined;
-    this.raml[scope] = raml;
+    this.apis[scope] = raml;
     const defaultScope = this.defaultScope;
-    this.ramlAwares.forEach(function(aware) {
+    this.awares.forEach(function(aware) {
       if (aware === srcAware) {
         return;
       }
@@ -74,8 +76,8 @@ const RAMLAware = {
 
   scopeChanged: function(aware) {
     const scope = aware.scope || this.defaultScope;
-    if (this.raml[scope]) {
-      aware.raml = this.raml[scope];
+    if (this.apis[scope]) {
+      aware.raml = this.apis[scope];
     }
   },
   /**
@@ -83,13 +85,13 @@ const RAMLAware = {
    * @param {String} scope
    */
   cleanUpData: function(scope) {
-    const awares = this.ramlAwares;
+    const awares = this.awares;
     for (let i = 0, len = awares.length; i < len; i++) {
       if (awares[i].scope === scope) {
         return;
       }
     }
-    delete this.raml[scope];
+    delete this.apis[scope];
   }
 };
 /**
@@ -131,57 +133,100 @@ const RAMLAware = {
  * @memberof ApiElements
  * @demo demo/index.html
  */
-export class RamlAware extends PolymerElement {
-  static get is() {
-    return 'raml-aware';
-  }
-  static get properties() {
-    return {
-      /**
-       * Scope for the RAML file.
-       * Different awares may have different scope and keep different RAML objects.
-       * It can be useful when one aware supports request panel and another
-       * RAML import for example. In this case first one may have scope not set
-       * (`default` scope) and second one `import` scope. Then both RAMLs are
-       * encapsulated to the scope.
-       */
-      scope: {
-        type: String,
-        observer: '_scopeChanged'
-      },
-      // The RAML/AMF definition.
-      raml: {
-        type: Object,
-        notify: true
-      }
-    };
-  }
-  static get observers() {
+export class RamlAware extends HTMLElement {
+  static get observedAttributes() {
     return [
-      '_ramlChanged(raml.*)'
+      'scope'
     ];
+  }
+  /**
+   * @return {Array|Object} Previously set API data
+   * @deprecated Use `api` property instead
+   */
+  get raml() {
+    return this.api;
+  }
+  /**
+   * The RAML/AMF definition.
+   * @param {Array|Object} value
+   * @deprecated Use `api` property instead
+   */
+  set raml(value) {
+    if (this._api === value) {
+      return;
+    }
+    this.api = value;
+    this.dispatchEvent(new CustomEvent('raml-changed', {
+      composed: true,
+      detail: {
+        value
+      }
+    }));
+  }
+  /**
+   * @return {Array|Object} Previously set API data
+   */
+  get api() {
+    return this._api;
+  }
+  /**
+   * The RAML/AMF definition.
+   * @param {Array|Object} value
+   */
+  set api(value) {
+    if (this._api === value) {
+      return;
+    }
+    this._api = value;
+    ApiAware.setApi(this);
+    this.dispatchEvent(new CustomEvent('api-changed', {
+      composed: true,
+      detail: {
+        value
+      }
+    }));
+  }
+  /**
+   * @return {String} Scope for the RAML file.
+   */
+  get scope() {
+    return this._scope;
+  }
+  /**
+   * Scope for the RAML file.
+   * Different awares may have different scope and keep different RAML objects.
+   * It can be useful when one aware supports request panel and another
+   * RAML import for example. In this case first one may have scope not set
+   * (`default` scope) and second one `import` scope. Then both RAMLs are
+   * encapsulated to the scope.
+   *
+   * @type {String}
+   * @param {String} value
+   */
+  set scope(value) {
+    if (this._scope === value) {
+      return;
+    }
+    this._scope = value;
+    ApiAware.scopeChanged(this);
+    if (value) {
+      this.setAttribute('scope', value);
+    } else {
+      this.removeAttribute('scope');
+    }
   }
 
   connectedCallback() {
-    super.connectedCallback();
-    RAMLAware.attachRamlAware(this);
+    ApiAware.attachAware(this);
   }
 
   disconnectedCallback() {
-    super.disconnectedCallback();
-    RAMLAware.detachRamlAware(this);
+    ApiAware.detachAware(this);
   }
-  /**
-   * Update RAML data for selected scope.
-   */
-  _scopeChanged() {
-    RAMLAware.scopeChanged(this);
-  }
-  /**
-   * Notifies other awares about RAML change.
-   */
-  _ramlChanged() {
-    RAMLAware.setRaml(this);
+
+  attributeChangedCallback(name, oldValue, newValue) {
+    // currently only "scope" is supported
+    this.scope = newValue;
   }
 }
-window.customElements.define(RamlAware.is, RamlAware);
+window.customElements.define('raml-aware', RamlAware);
