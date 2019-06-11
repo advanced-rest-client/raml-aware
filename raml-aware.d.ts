@@ -10,8 +10,7 @@
 
 
 // tslint:disable:variable-name Describing an API that's defined elsewhere.
-
-import {PolymerElement} from '@polymer/polymer/polymer-element.js';
+// tslint:disable:no-any describes the API as best we are able today
 
 export {RamlAware};
 
@@ -50,34 +49,13 @@ declare namespace ApiElements {
    * web components callback methods to initialize value. If the component is
    * never attached it will never initialize it's values.
    */
-  class RamlAware extends PolymerElement {
-
-    /**
-     * Scope for the RAML file.
-     * Different awares may have different scope and keep different RAML objects.
-     * It can be useful when one aware supports request panel and another
-     * RAML import for example. In this case first one may have scope not set
-     * (`default` scope) and second one `import` scope. Then both RAMLs are
-     * encapsulated to the scope.
-     */
-    scope: string|null|undefined;
-
-    /**
-     * The RAML/AMF definition.
-     */
-    raml: object|null|undefined;
+  class RamlAware extends HTMLElement {
+    raml: any[]|object|null;
+    api: any[]|object|null;
+    scope: String|null;
     connectedCallback(): void;
     disconnectedCallback(): void;
-
-    /**
-     * Update RAML data for selected scope.
-     */
-    _scopeChanged(): void;
-
-    /**
-     * Notifies other awares about RAML change.
-     */
-    _ramlChanged(): void;
+    attributeChangedCallback(name: any, oldValue: any, newValue: any): void;
   }
 }
 

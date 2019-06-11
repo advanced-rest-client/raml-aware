@@ -5,34 +5,28 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
   <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
   <title>raml-aware demo</title>
-  <script src="../../../@webcomponents/webcomponentsjs/webcomponents-bundle.js"></script>
-  <script type="module" src="../../../@polymer/iron-demo-helpers/demo-pages-shared-styles.js"></script>
-  <script type="module" src="../../../@polymer/iron-demo-helpers/demo-snippet.js"></script>
-  <script type="module" src="../../../@polymer/polymer/lib/utils/render-status.js"></script>
+  <script src="../node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
+  <script type="module" src="../node_modules/@advanced-rest-client/arc-demo-helper/arc-demo-helper.js"></script>
   <script type="module" src="../raml-aware.js"></script>
-  <custom-style>
-    <style is="custom-style" include="demo-pages-shared-styles">
-    </style>
-  </custom-style>
 </head>
 <body unresolved>
   <div class="vertical-section-container centered">
     <h3>The `raml-aware`</h3>
-    <demo-snippet>
+    <arc-demo-helper>
       <template>
         <raml-aware id="r1"></raml-aware>
         <raml-aware id="r2" scope="demo"></raml-aware>
         <raml-aware id="r3"></raml-aware>
         <raml-aware id="r4" scope="demo"></raml-aware>
         <code></code>
+
         <script type="module">
-          import {afterNextRender} from '../../../@polymer/polymer/lib/utils/render-status.js';
           const awares = ['r1', 'r2', 'r3', 'r4'].map((id) =>
             document.querySelector('#' + id));
           const output = document.querySelector('code');
-          awares[0].raml = {'a': 'b'};
-          awares[1].raml = {'c': 'd'};
-          afterNextRender(window, () => {
+          awares[0].raml = { 'a': 'b' };
+          awares[1].raml = { 'c': 'd' };
+          setTimeout(() => {
             let txt = '<raml-aware id="r1"></raml-aware>.raml = ' +
               JSON.stringify(awares[0].raml) + '\n';
             txt += '<raml-aware id="r2" scope="demo"></raml-aware>.raml = ' +
@@ -45,7 +39,7 @@
           });
         </script>
       </template>
-    </demo-snippet>
+    </arc-demo-helper>
   </div>
 </body>
 </html>
