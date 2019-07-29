@@ -77,3 +77,7 @@
 
 
 
+# [3.0.0](https://github.com/advanced-rest-client/raml-aware/compare/1.0.2...3.0.0) (2019-07-29)
+
+
+
