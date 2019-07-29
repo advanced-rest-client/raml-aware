@@ -49,8 +49,6 @@ const ApiAware = {
     if (index !== -1) {
       this.awares.splice(index, 1);
       this.cleanUpData(aware.scope);
-    } else {
-      console.warn('The aware wasn\'t attached!');
     }
   },
   /**
